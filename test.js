@@ -60,10 +60,10 @@ $('#chat-box-div').append($('<div/>', {
 
 $('#chat-box-head').append('<div class="row"><div class="hidden-xs col-sm-2 col-md-2  "><img src="/sites/SBILife/images/mascot.jpg" class="img-head img-responsive"></div><div class="col-xs-10 col-sm-8 col-md-8 "> <span id="menu-bar" > I am RIA - Real Intelligent Assistant</span></div><div class="col-xs-2 col-sm-2 col-md-2 pull-right  ">    <img src="/sites/SBILife/images/cross.png" id="close-button" class="menu-button img-responsive" ></div></div>');
 
- 
+
 
 // Add close-button span  
-  
+
 
 // Put the close-button inside span
 /* $('#menu-bar').append($('<img>', {
@@ -72,7 +72,7 @@ $('#chat-box-head').append('<div class="row"><div class="hidden-xs col-sm-2 col-
   id: 'close-button',
   class: 'menu-button'
 })); */
-   
+
 
 // Create the chat-box-main
 $('#chat-box-div').append($('<div/>', {
@@ -148,54 +148,6 @@ $(document).ready(function (){
   user_id = getCookie('user_id');
   scroll_to_bottom();
 
-  if (user_id.length > 0) {
-    console.log("Fetching message history");
-    $.ajax({
-      url: server + "messages/",
-      type: "post",
-      dataType: 'json',
-      crossDomain: true,
-      data: { 
-        "user_id": user_id
-      },
-      success: function(response) {
-        console.log("Fetched message history");
-        messages = response.messages;
-        for (var i = 0; i < messages.length; i++) {
-          add_query(messages[i].message);
-          add_response(messages[i].answer);
-        }
-        change_related_questions(response);
-        help_suggestions[0] = response.help_suggestion1;
-        help_suggestions[1] = response.help_suggestion2;
-        base_response = response.base_response;
-      },
-      error: function(xhr, textstatus, errorthrown) {
-        console.log("Error in fetching message history");
-      }
-    }).done(function() {
-      add_response(base_response);
-    });
-  } else {
-    console.log("Fetching base response");
-    $.ajax({
-      url: server + "basemessage/",
-      type: "post",
-      dataType: 'json',
-      crossDomain: true,
-      success: function(response) {
-        change_related_questions(response);
-        base_response = response.base_response;
-        help_suggestions[0] = response.help_suggestion1;
-        help_suggestions[1] = response.help_suggestion2;
-        add_response(base_response);
-        console.log("Fetched base response");
-      },
-      error: function(xhr, textstatus, errorthrown) {
-        console.log("Error in fetching base response");
-      }
-    });
-  }
 });
 
 function get_time() {
@@ -211,8 +163,8 @@ function get_time() {
 
 function add_response(response) {
   $("#chat-div").append('<div><div class="talk-time-server"><img class="img-head talk-img-server" src="/sites/SBILife/images/mascot.jpg">'
-+ '<div class="RIA"><strong>RIA</strong></div>' +'</div><div class="talk-bubble-left tri-right left-top""><div class="talktext"><p>'
-+ response + '</p></div><div><p class="time" align="right">' + get_time() + '</p></div></div></div>');
+    + '<div class="RIA"><strong>RIA</strong></div>' +'</div><div class="talk-bubble-left tri-right left-top""><div class="talktext"><p>'
+    + response + '</p></div><div><p class="time" align="right">' + get_time() + '</p></div></div></div>');
   scroll_to_bottom();
   if (!isMobileDevice()) {
     $('#chat-text').focus();
@@ -221,9 +173,9 @@ function add_response(response) {
 
 function add_query(text) {
   $("#chat-div").append('<div><div class="talk-time-user"><img class="img-head talk-img-user" src="/sites/SBILife/images/user.png">'
-+ '<div class="You"><strong>YOU</strong></div>' + '<small class="time-right-div">'
-+ '</small></div><div class="talk-bubble-right tri-right right-top""><div class="talktext"><p>' 
-+ text + '</p></div><div><p class="time" align="right">' + get_time() + '</p></div></div></div>');
+    + '<div class="You"><strong>YOU</strong></div>' + '<small class="time-right-div">'
+    + '</small></div><div class="talk-bubble-right tri-right right-top""><div class="talktext"><p>' 
+    + text + '</p></div><div><p class="time" align="right">' + get_time() + '</p></div></div></div>');
 }
 
 function scroll_to_bottom() {
@@ -267,8 +219,8 @@ function process(text, mode) {
   help_request_shown = false;
   $("#chat-div").append('<div><div class="talk-time-user"><img class="img-head talk-img-user" src="/sites/SBILife/images/user.png">'
     + '<div class="You"><strong>YOU</strong></div>' + '<small class="time-right-div">'
-+ '</small></div><div class="talk-bubble-right tri-right right-top"><div class="talktext"><p>' 
-+ text + '</p></div><div><p class="time" align="right">' + get_time() + '</p></div></div></div>');
+    + '</small></div><div class="talk-bubble-right tri-right right-top"><div class="talktext"><p>' 
+    + text + '</p></div><div><p class="time" align="right">' + get_time() + '</p></div></div></div>');
   scroll_to_bottom();
 
   text = text.replace(/\W/g, ' ').trim().toLowerCase();
@@ -350,6 +302,25 @@ $("#related-question-1").click(function(e) {
 });
 
 $('#mascot').click(function(e) {
+  if (base_response.length == 0) {
+    $.ajax({
+      url: server + "basemessage/",
+      type: "post",
+      dataType: 'json',
+      crossDomain: true,
+      success: function(response) {
+        change_related_questions(response);
+        base_response = response.base_response;
+        help_suggestions[0] = response.help_suggestion1;
+        help_suggestions[1] = response.help_suggestion2;
+        add_response(base_response);
+        console.log("Fetched base response");
+      },
+      error: function(xhr, textstatus, errorthrown) {
+        console.log("Error in fetching base response");
+      }
+    });
+  }
   $('#mascot').hide();
   $("#chat-box-div").slideDown("slow");
   $(".chat-box-main").slideDown("slow");
@@ -361,4 +332,3 @@ $('#mascot').click(function(e) {
     $('#chat-text').focus();
   }
 });
-  
